@@ -1,4 +1,7 @@
 {
     "node": true,
-    "nomen": true
+    "nomen": true,
+    "predef": [
+        "jsboard"
+    ]
 }
