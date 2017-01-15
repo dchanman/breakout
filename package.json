@@ -1,0 +1,23 @@
+{
+  "name": "breakout",
+  "version": "1.0.0",
+  "description": "Board game concept",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dchanman/breakout.git"
+  },
+  "author": "Derek Chan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dchanman/breakout/issues"
+  },
+  "homepage": "https://github.com/dchanman/breakout#readme",
+  "dependencies": {
+    "ejs": "^2.5.5",
+    "express": "^4.14.0"
+  }
+}

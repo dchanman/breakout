@@ -1,0 +1,8 @@
+{
+  "name": "Breakout",
+  "description": "A board game concept",
+  "repository": "https://github.com/dchanman/breakout",
+  "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["breakout", "boardgame"],
+  "image": "heroku/nodejs"
+}
