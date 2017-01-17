@@ -1,7 +1,8 @@
 {
     "node": true,
     "nomen": true,
+    "plusplus": true,
     "predef": [
-        "jsboard"
+        "jsboard", "Breakout"
     ]
 }
