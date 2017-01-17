@@ -57,11 +57,14 @@ Breakout.piece_stack = function (piece, increment) {
     return jsboard.piece({text: name, fontSize: "35px", textAlign: "center"}).clone();
 };
 
+/**
+ * Removes all extra classes and listeners from the board
+ */
 Breakout.prototype.resetBoard = function () {
     var x, y;
-    for (y = 0; y < this.board.cols(); y++) {
-        for (x = 0; x < this.board.rows(); x++) {
-            this.board.cell([x, y]).DOM().classList.remove("legalMove");
+    for (y = 0; y < this.board.rows(); y++) {
+        for (x = 0; x < this.board.cols(); x++) {
+            this.board.cell([y, x]).DOM().classList.remove("legalMove");
             // this.board.cell([x,y]).removeOn("click", movePiece);
         }
     }
@@ -80,18 +83,19 @@ Breakout.prototype.getLegalMoves = function (cell) {
         y,
         legalMoves = [],
         legalMovesHelper;
-    console.log(side);
-    console.log(loc[0] + "," + loc[1]);
     /**
      * If x and y is a legal move, add it to legalMoves
      * @returns {Boolean} true to continue searching, false to break
      */
     legalMovesHelper = function (board, x, y) {
-        if (board.cell([y, x]).get() === null) {
-            legalMoves.push([y, x]);
-            return true;
+        legalMoves.push([y, x]);
+        if (board.cell([y, x]).get() !== null) {
+            var _piece = board.cell([y, x]).get();
+            if (Breakout.piece_getSide(_piece) === side) {
+                return false;
+            }
         }
-        return false;
+        return true;
     };
     // Right
     x = loc[1];
