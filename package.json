@@ -4,7 +4,7 @@
   "description": "Board game concept",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/karma/bin/karma start karma.conf.js"
   },
   "repository": {
     "type": "git",
@@ -19,5 +19,11 @@
   "dependencies": {
     "ejs": "^2.5.5",
     "express": "^4.14.0"
+  },
+  "devDependencies": {
+    "jasmine": "^2.5.3",
+    "karma": "^1.4.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^1.1.0"
   }
 }
