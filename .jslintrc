@@ -3,6 +3,8 @@
     "nomen": true,
     "plusplus": true,
     "predef": [
-        "jsboard", "Breakout"
+        "jsboard",
+        "describe", "it", "expect",
+        "Breakout", "BreakoutBoard"
     ]
 }

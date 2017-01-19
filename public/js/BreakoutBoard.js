@@ -7,7 +7,7 @@ var BreakoutBoard = function (cols, rows) {
     var i,
         j;
     for (i = 0; i < rows; i++) {
-        this.board[i].push([]);
+        this.board.push([]);
         for (j = 0; j < cols; j++) {
             this.board[i].push(null);
         }
@@ -18,7 +18,7 @@ BreakoutBoard.prototype.toString = function () {
     var string,
         i,
         j;
-    string = this.cols + "," + this.rows;
+    string = this.cols + "," + this.rows + ",";
     string += "[";
     for (i = 0; i < this.rows; i++) {
         string += "[";
@@ -26,7 +26,9 @@ BreakoutBoard.prototype.toString = function () {
             if (j > 0) {
                 string += ",";
             }
-            string += this.board[i][j] === null ? "  " : this.board[i][j];
+            if (this.board[i][j] !== null) {
+                string += this.board[i][j];
+            }
         }
         string += "]";
     }
