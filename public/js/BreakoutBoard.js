@@ -14,12 +14,33 @@ var BreakoutBoard = function (cols, rows) {
     }
 };
 
+BreakoutBoard.fromString = function (string) {
+    var items = string.split(";"),
+        cols = parseInt(items[0], 10),
+        rows = parseInt(items[1], 10),
+        matrixString = items[2],
+        regexp = /\[([A-Za-z0-9,]*)\]/gi,
+        matrixContents = matrixString.match(regexp),
+        board = new BreakoutBoard(cols, rows),
+        row,
+        i,
+        j;
+    for (i = 0; i < rows; i++) {
+        row = matrixContents[i]
+            .substring(1, matrixContents[i].length - 1)
+            .split(",");
+        for (j = 0; j < cols; j++) {
+            board.board[i][j] = row[j] === '' ? null : row[j];
+        }
+    }
+    return board;
+};
+
 BreakoutBoard.prototype.toString = function () {
     var string,
         i,
         j;
-    string = this.cols + "," + this.rows + ",";
-    string += "[";
+    string = this.cols + ";" + this.rows + ";";
     for (i = 0; i < this.rows; i++) {
         string += "[";
         for (j = 0; j < this.cols; j++) {
@@ -32,6 +53,5 @@ BreakoutBoard.prototype.toString = function () {
         }
         string += "]";
     }
-    string += "]";
     return string;
 };
