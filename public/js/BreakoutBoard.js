@@ -56,6 +56,45 @@ BreakoutBoard.prototype.toString = function () {
     return string;
 };
 
+BreakoutBoard.prototype.getLegalMoves = function (col, row) {
+    if (col < 0 || col >= this.cols || row < 0 || row >= this.rows) {
+        return [];
+    }
+    if (this.board[col][row] === null) {
+        return [];
+    }
+    var side = this.board[col][row].side,
+        legalMoves = [],
+        x,
+        y,
+        legalMovesHelper = function (board, x, y) {
+            legalMoves.push([x, y]);
+            if (board[x][y] && board[x][y].side === side) {
+                return false;
+            }
+            return true;
+        };
+    // Right
+    x = col;
+    for (y = row + 1; y < this.rows; y++) {
+        if (!legalMovesHelper(this.board, x, y)) { break; }
+    }
+    // Left
+    for (y = row - 1; y >= 0; y--) {
+        if (!legalMovesHelper(this.board, x, y)) { break; }
+    }
+    // Down
+    y = row;
+    for (x = col + 1; x < this.cols; x++) {
+        if (!legalMovesHelper(this.board, x, y)) { break; }
+    }
+    // Up
+    for (x = col - 1; x >= 0; x--) {
+        if (!legalMovesHelper(this.board, x, y)) { break; }
+    }
+    return legalMoves;
+};
+
 var Piece = function (side, stackHeight) {
     this.side = side;
     this.stackHeight = stackHeight;

@@ -1,5 +1,27 @@
 "use strict";
 
+Array.prototype.containsSameMoves = function (other) {
+    var i,
+        j,
+        found;
+    if (this.length !== other.length) {
+        return false;
+    }
+    for (i = 0; i < this.length; i++) {
+        found = false;
+        for (j = 0; j < other.length; j++) {
+            if (this[i][0] === other[j][0] && this[i][1] === other[j][1]) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return false;
+        }
+    }
+    return true;
+};
+
 describe('BreakoutBoard test', function () {
     it('should convert a small board to string', function () {
         var board = new BreakoutBoard(1, 2);
@@ -38,6 +60,32 @@ describe('BreakoutBoard test', function () {
         expect(board.rows).toBe(1);
         expect(board.board[0][0]).toBe('a');
         expect(board.board[0][1]).toBe('b');
+    });
+    it('should handle illegal legal move requests', function () {
+        var board = new BreakoutBoard(3, 4);
+        board.board[1][2] = new Piece("x", 1);
+        expect(board.getLegalMoves(0, 0)).toEqual([]);
+        expect(board.getLegalMoves(-1, 0)).toEqual([]);
+        expect(board.getLegalMoves(0, -1)).toEqual([]);
+        expect(board.getLegalMoves(4, 0)).toEqual([]);
+        expect(board.getLegalMoves(0, 5)).toEqual([]);
+        expect(board.getLegalMoves(1, 1)).toEqual([]);
+    });
+    it('should get legal moves correctly', function () {
+        // _ _ _
+        // _ x _
+        // _ _ _
+        // _ _ _
+        var board = new BreakoutBoard(3, 4),
+            legalMoves;
+        board.board[1][2] = new Piece("x", 1);
+        legalMoves = board.getLegalMoves(1, 2);
+        expect(legalMoves.containsSameMoves([
+            [1, 3],
+            [1, 1], [1, 0],
+            [2, 2],
+            [0, 2]
+        ])).toBe(true);
     });
 });
 
