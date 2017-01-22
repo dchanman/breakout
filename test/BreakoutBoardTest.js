@@ -87,6 +87,48 @@ describe('BreakoutBoard test', function () {
             [0, 2]
         ])).toBe(true);
     });
+    it('should get legal moves correctly with same team collisions', function () {
+        // _ _ _ _ _
+        // _ _ x _ _
+        // _ x x x _
+        // _ _ x _ _
+        // _ _ _ _ _
+        var board = new BreakoutBoard(5, 5),
+            legalMoves;
+        board.board[1][2] = new Piece("x", 1);
+        board.board[2][1] = new Piece("x", 1);
+        board.board[2][2] = new Piece("x", 1);
+        board.board[2][3] = new Piece("x", 1);
+        board.board[3][2] = new Piece("x", 1);
+        legalMoves = board.getLegalMoves(2, 2);
+        expect(legalMoves.containsSameMoves([
+            [1, 2],
+            [2, 1],
+            [2, 3],
+            [3, 2]
+        ])).toBe(true);
+    });
+    it('should get legal moves correctly with diff team collisions', function () {
+        // _ _ _ _ _
+        // _ _ o _ _
+        // _ o x o _
+        // _ _ o _ _
+        // _ _ _ _ _
+        var board = new BreakoutBoard(5, 5),
+            legalMoves;
+        board.board[1][2] = new Piece("o", 1);
+        board.board[2][1] = new Piece("o", 1);
+        board.board[2][2] = new Piece("x", 1);
+        board.board[2][3] = new Piece("o", 1);
+        board.board[3][2] = new Piece("o", 1);
+        legalMoves = board.getLegalMoves(2, 2);
+        expect(legalMoves.containsSameMoves([
+            [1, 2], [0, 2],
+            [2, 1], [2, 0],
+            [2, 3], [2, 4],
+            [3, 2], [4, 2]
+        ])).toBe(true);
+    });
 });
 
 describe('Piece test', function () {
