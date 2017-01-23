@@ -57,6 +57,7 @@ BreakoutBoard.prototype.toString = function () {
 };
 
 BreakoutBoard.prototype.getLegalMoves = function (col, row) {
+    console.log(col, row);
     if (col < 0 || col >= this.cols || row < 0 || row >= this.rows) {
         return [];
     }
