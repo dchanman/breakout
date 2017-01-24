@@ -6,9 +6,9 @@ var BreakoutBoard = function (cols, rows) {
     this.board = [];
     var i,
         j;
-    for (i = 0; i < rows; i++) {
+    for (i = 0; i < cols; i++) {
         this.board.push([]);
-        for (j = 0; j < cols; j++) {
+        for (j = 0; j < rows; j++) {
             this.board[i].push(null);
         }
     }
@@ -30,7 +30,7 @@ BreakoutBoard.fromString = function (string) {
             .substring(1, matrixContents[i].length - 1)
             .split(",");
         for (j = 0; j < cols; j++) {
-            board.board[i][j] = row[j] === '' ? null : row[j];
+            board.board[j][i] = row[j] === '' ? null : row[j];
         }
     }
     return board;
@@ -41,15 +41,13 @@ BreakoutBoard.prototype.toString = function () {
         i,
         j;
     string = this.cols + ";" + this.rows + ";";
-    for (i = 0; i < this.rows; i++) {
+    for (j = 0; j < this.rows; j++) {
         string += "[";
-        for (j = 0; j < this.cols; j++) {
-            if (j > 0) {
+        for (i = 0; i < this.cols; i++) {
+            if (i > 0) {
                 string += ",";
             }
-            if (this.board[i][j] !== null) {
-                string += this.board[i][j];
-            }
+            string += this.board[i][j] || "";
         }
         string += "]";
     }
@@ -57,7 +55,6 @@ BreakoutBoard.prototype.toString = function () {
 };
 
 BreakoutBoard.prototype.getLegalMoves = function (col, row) {
-    console.log(col, row);
     if (col < 0 || col >= this.cols || row < 0 || row >= this.rows) {
         return [];
     }

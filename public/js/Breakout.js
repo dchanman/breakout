@@ -15,8 +15,8 @@ var Breakout = function (board, numRows) {
     // Set up board
     for (y = 0; y < numRows; y++) {
         for (x = 0; x < this.breakoutBoard.cols; x++) {
-            this.breakoutBoard.board[x][1 + y] = "X1";
-            this.breakoutBoard.board[x][this.breakoutBoard.rows - 2 - y] = "O1";
+            this.breakoutBoard.board[x][1 + y] = new Piece("X", 1);
+            this.breakoutBoard.board[x][this.breakoutBoard.rows - 2 - y] = new Piece("O", 1);
         }
     }
     this.renderBoard();
@@ -52,14 +52,13 @@ Breakout.prototype.resetBoard = function () {
 
 Breakout.prototype.renderBoard = function () {
     var x, y;
-    console.log("Rendering " + this.breakoutBoard.toString());
     for (x = 0; x < this.breakoutBoard.cols; x++) {
         for (y = 0; y < this.breakoutBoard.rows; y++) {
             if (this.breakoutBoard.board[x][y]) {
                 this.board.cell([y, x]).place(
                     Breakout.piece(
-                        this.breakoutBoard.board[x][y][0],
-                        parseInt(this.breakoutBoard.board[x][y].substr(1), 10)
+                        this.breakoutBoard.board[x][y].side,
+                        parseInt(this.breakoutBoard.board[x][y].stackHeight, 10)
                     )
                 );
             } else {
@@ -77,7 +76,6 @@ Breakout.prototype.onClick = function (cell) {
     this.resetBoard();
     if (coord.get() !== null) {
         legalMoves = this.breakoutBoard.getLegalMoves(x, y);
-        console.log(legalMoves);
         for (i = 0; i < legalMoves.length; i++) {
             this.board.cell([legalMoves[i][1], legalMoves[i][0]]).DOM().classList.add("legalMove");
         }
