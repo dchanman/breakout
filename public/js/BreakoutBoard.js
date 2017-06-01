@@ -9,24 +9,21 @@ Square.prototype.equals = function (other) {
     return (other !== null && this.x === other.x && this.y === other.y);
 };
 
-var Move = function (x_from, y_from, x_to, y_to) {
-    this.x_from = x_from;
-    this.y_from = y_from;
-    this.x_to = x_to;
-    this.y_to = y_to;
+Square.prototype.toString = function () {
+    return "(" + this.x + "," + this.y + ")";
+};
+
+var Move = function (from_x, from_y, to_x, to_y) {
+    this.from = new Square(from_x, from_y);
+    this.to = new Square(to_x, to_y);
 };
 
 Move.prototype.equals = function (other) {
-    return (this.x_from === other.x_from &&
-        this.y_from === other.y_from &&
-        this.x_to === other.x_to &&
-        this.y_to === other.y_to
-    );
+    return (other !== null && this.from.equals(other.from) && this.to.equals(other.to));
 };
 
 Move.prototype.isStationary = function () {
-    return (this.x_from === this.x_to &&
-        this.y_from === this.y_to);
+    return (this.from.equals(this.to));
 };
 
 Move.prototype.isInMoveList = function (list) {
@@ -40,29 +37,29 @@ Move.prototype.isInMoveList = function (list) {
 };
 
 Move.prototype.toString = function () {
-    return "(" + this.x_from + "," + this.y_from + ")-(" +
-        this.x_to + "," + this.y_to + ")";
+    return this.x.toString() + "-" + this.y.toString();
 };
 
 Move.prototype.getStep = function () {
-    if (this.x_from > this.x_to) {
-        return new Square(this.x_from - 1, this.y_from);
+    if (this.from.x > this.to.x) {
+        return new Square(this.from.x - 1, this.from.y);
     }
-    if (this.x_from < this.x_to) {
-        return new Square(this.x_from + 1, this.y_from);
+    if (this.from.x < this.to.x) {
+        return new Square(this.from.x + 1, this.from.y);
     }
-    if (this.y_from > this.y_to) {
-        return new Square(this.x_from, this.y_from - 1);
+    if (this.from.y > this.to.y) {
+        return new Square(this.from.x, this.from.y - 1);
     }
-    if (this.y_from < this.y_to) {
-        return new Square(this.x_from, this.y_from + 1);
+    if (this.from.y < this.to.y) {
+        return new Square(this.from.x, this.from.y + 1);
     }
-    return new Square(this.x_from, this.y_from);
+    return new Square(this.from.x, this.from.y);
 };
 
 Move.prototype.step = function () {
     var step = this.getStep();
-    return new Move(step.x, step.y, this.x_to, this.y_to);
+    // console.log(step.toString());
+    return new Move(step.x, step.y, this.to.x, this.to.y);
 };
 
 var BreakoutBoard = function (cols, rows) {
@@ -169,16 +166,16 @@ BreakoutBoard.prototype.getLegalMoves = function (col, row) {
 BreakoutBoard.prototype.applyMoves = function (move1, move2) {
     // Check legality of moves
     var legalMoves1, legalMoves2;
-    if (move1.x_from === move2.x_from && move1.y_from === move2.y_from) {
+    if (move1.from.x === move2.from.x && move1.from.y === move2.from.y) {
         // console.log("Illegal moves: " + move1.toString() + ", " + move2.toString());
         return false;
     }
-    legalMoves1 = this.getLegalMoves(move1.x_from, move1.y_from);
+    legalMoves1 = this.getLegalMoves(move1.from.x, move1.from.y);
     if (!move1.isInMoveList(legalMoves1)) {
         // console.log("Illegal move: " + move1.toString());
         return false;
     }
-    legalMoves2 = this.getLegalMoves(move2.x_from, move2.y_from);
+    legalMoves2 = this.getLegalMoves(move2.from.x, move2.from.y);
     if (!move2.isInMoveList(legalMoves2)) {
         // console.log("Illegal move: " + move2.toString());
         return false;
@@ -190,24 +187,24 @@ BreakoutBoard.prototype.applyMoves = function (move1, move2) {
             return;
         }
         // Terminating Condition 2: Two pieces have collided on the previous step
-        if (move1.x_from === move2.x_from && move1.y_from === move2.y_from) {
+        if (move1.from.x === move2.from.x && move1.from.y === move2.from.y) {
             return;
         }
-        piece1 = board.board[move1.x_from][move1.y_from];
-        piece2 = board.board[move2.x_from][move2.y_from];
-        board.board[move1.x_from][move1.y_from] = null;
-        board.board[move2.x_from][move2.y_from] = null;
+        piece1 = board.board[move1.from.x][move1.from.y];
+        piece2 = board.board[move2.from.x][move2.from.y];
+        board.board[move1.from.x][move1.from.y] = null;
+        board.board[move2.from.x][move2.from.y] = null;
         move1step = move1.getStep();
         move2step = move2.getStep();
         // Terminating Condition 3: Two adjacent pieces moving into one another:
         // The larger piece will not be moved
-        if (move1.x_from === move2step.x && move1.y_from === move2step.y
-                && move2.x_from === move1step.x && move2.y_from === move1step.y) {
+        if (move1.from.x === move2step.x && move1.from.y === move2step.y
+                && move2.from.x === move1step.x && move2.from.y === move1step.y) {
             stack = Piece.stack(piece1, piece2);
             if (piece1.isLargerThan(piece2)) {
-                board.board[move1.x_from][move1.y_from] = stack;
+                board.board[move1.from.x][move1.from.y] = stack;
             } else {
-                board.board[move2.x_from][move2.y_from] = stack;
+                board.board[move2.from.x][move2.from.y] = stack;
             }
             return;
         }
