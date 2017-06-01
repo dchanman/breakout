@@ -1,5 +1,14 @@
 "use strict";
 
+var Square = function (x, y) {
+    this.x = x;
+    this.y = y;
+};
+
+Square.prototype.equals = function (other) {
+    return (other !== null && this.x === other.x && this.y === other.y);
+};
+
 var Move = function (x_from, y_from, x_to, y_to) {
     this.x_from = x_from;
     this.y_from = y_from;
@@ -15,6 +24,11 @@ Move.prototype.equals = function (other) {
     );
 };
 
+Move.prototype.isStationary = function () {
+    return (this.x_from === this.x_to &&
+        this.y_from === this.y_to);
+};
+
 Move.prototype.isInMoveList = function (list) {
     var i;
     for (i = 0; i < list.length; i++) {
@@ -28,6 +42,27 @@ Move.prototype.isInMoveList = function (list) {
 Move.prototype.toString = function () {
     return "(" + this.x_from + "," + this.y_from + ")-(" +
         this.x_to + "," + this.y_to + ")";
+};
+
+Move.prototype.getStep = function () {
+    if (this.x_from > this.x_to) {
+        return new Square(this.x_from - 1, this.y_from);
+    }
+    if (this.x_from < this.x_to) {
+        return new Square(this.x_from + 1, this.y_from);
+    }
+    if (this.y_from > this.y_to) {
+        return new Square(this.x_from, this.y_from - 1);
+    }
+    if (this.y_from < this.y_to) {
+        return new Square(this.x_from, this.y_from + 1);
+    }
+    return new Square(this.x_from, this.y_from);
+};
+
+Move.prototype.step = function () {
+    var step = this.getStep();
+    return new Move(step.x, step.y, this.x_to, this.y_to);
 };
 
 var BreakoutBoard = function (cols, rows) {
@@ -94,19 +129,19 @@ BreakoutBoard.prototype.getLegalMoves = function (col, row) {
     var side = this.board[col][row].side,
         legalMoves = [],
         x,
-        y,
-        /**
-         * This function adds the current tile to the set of legal moves.
-         * It then returns 'true' if the tile would not have blocked
-         * any additional legal moves, or 'false' otherwise.
-         */
-        iterativelyAddLegalMoves = function (board, x, y) {
-            legalMoves.push(new Move(col, row, x, y));
-            if (board[x][y] && board[x][y].side === side) {
-                return false;
-            }
-            return true;
-        };
+        y;
+    /**
+     * This function adds the current tile to the set of legal moves.
+     * It then returns 'true' if the tile would not have blocked
+     * any additional legal moves, or 'false' otherwise.
+     */
+    function iterativelyAddLegalMoves(board, x, y) {
+        legalMoves.push(new Move(col, row, x, y));
+        if (board[x][y] && board[x][y].side === side) {
+            return false;
+        }
+        return true;
+    }
     // Right
     x = col;
     for (y = row + 1; y < this.rows; y++) {
@@ -133,7 +168,7 @@ BreakoutBoard.prototype.getLegalMoves = function (col, row) {
  */
 BreakoutBoard.prototype.applyMoves = function (move1, move2) {
     // Check legality of moves
-    var legalMoves1, legalMoves2, piece1, piece2, stack;
+    var legalMoves1, legalMoves2;
     if (move1.x_from === move2.x_from && move1.y_from === move2.y_from) {
         // console.log("Illegal moves: " + move1.toString() + ", " + move2.toString());
         return false;
@@ -148,21 +183,42 @@ BreakoutBoard.prototype.applyMoves = function (move1, move2) {
         // console.log("Illegal move: " + move2.toString());
         return false;
     }
-    // Case 1: Two adjacent pieces moving into one another:
-    // The larger piece will not be moved
-    if (move1.x_from === move2.x_to && move1.y_from === move2.y_to
-            && move2.x_from === move1.x_to && move2.y_from === move1.y_to) {
-        piece1 = this.board[move1.x_from][move1.y_from];
-        piece2 = this.board[move2.x_from][move2.y_from];
-        stack = Piece.stack(piece1, piece2);
-        this.board[move1.x_from][move1.y_from] = null;
-        this.board[move2.x_from][move2.y_from] = null;
-        if (piece1.isLargerThan(piece2)) {
-            this.board[move1.x_from][move1.y_from] = stack;
-        } else {
-            this.board[move2.x_from][move2.y_from] = stack;
+    function recursiveStep(board, move1, move2) {
+        var piece1, piece2, dest1, dest2, stack, move1step, move2step;
+        // Terminating Condition 1: Both moves have completed
+        if (move1.isStationary() && move2.isStationary()) {
+            return;
         }
+        // Terminating Condition 2: Two pieces have collided on the previous step
+        if (move1.x_from === move2.x_from && move1.y_from === move2.y_from) {
+            return;
+        }
+        piece1 = board.board[move1.x_from][move1.y_from];
+        piece2 = board.board[move2.x_from][move2.y_from];
+        board.board[move1.x_from][move1.y_from] = null;
+        board.board[move2.x_from][move2.y_from] = null;
+        move1step = move1.getStep();
+        move2step = move2.getStep();
+        // Terminating Condition 3: Two adjacent pieces moving into one another:
+        // The larger piece will not be moved
+        if (move1.x_from === move2step.x && move1.y_from === move2step.y
+                && move2.x_from === move1step.x && move2.y_from === move1step.y) {
+            stack = Piece.stack(piece1, piece2);
+            if (piece1.isLargerThan(piece2)) {
+                board.board[move1.x_from][move1.y_from] = stack;
+            } else {
+                board.board[move2.x_from][move2.y_from] = stack;
+            }
+            return;
+        }
+        // Recursive Step: Place pieces onto new squares, recurse
+        dest1 = board.board[move1step.x][move1step.y];
+        board.board[move1step.x][move1step.y] = Piece.stack(piece1, dest1);
+        dest2 = board.board[move2step.x][move2step.y];
+        board.board[move2step.x][move2step.y] = Piece.stack(piece2, dest2);
+        recursiveStep(board, move1.step(), move2.step());
     }
+    recursiveStep(this, move1, move2);
     return true;
 };
 
