@@ -153,6 +153,55 @@ describe('BreakoutBoard test', function () {
         expect(board.applyMoves(new Move(2, 2, 0, 2), new Move(2, 1, 2, 4))).toBe(false);
         expect(board.applyMoves(new Move(2, 1, 2, 4), new Move(2, 2, 0, 2))).toBe(false);
     });
+    it('should resolve collisions between adjacent pieces', function () {
+        var board = new BreakoutBoard(2, 2);
+        // o1 _
+        // x1 _
+        board.board[0][0] = new Piece("o", 1);
+        board.board[0][1] = new Piece("x", 1);
+        expect(board.applyMoves(new Move(0, 0, 0, 1), new Move(0, 1, 0, 0))).toBe(true);
+        expect(board.board[0][0]).toBe(null);
+        expect(board.board[0][1]).toBe(null);
+        // o1 _
+        // x2 _
+        var board = new BreakoutBoard(2, 2);
+        board.board[0][0] = new Piece("o", 1);
+        board.board[0][1] = new Piece("x", 2);
+        expect(board.applyMoves(new Move(0, 0, 0, 1), new Move(0, 1, 0, 0))).toBe(true);
+        expect(board.board[0][0]).toBe(null);
+        expect(board.board[0][1].toString()).toBe("x1");
+        // o2 _
+        // x1 _
+        var board = new BreakoutBoard(2, 2);
+        board.board[0][0] = new Piece("o", 2);
+        board.board[0][1] = new Piece("x", 1);
+        expect(board.applyMoves(new Move(0, 0, 0, 1), new Move(0, 1, 0, 0))).toBe(true);
+        expect(board.board[0][0].toString()).toBe("o1");
+        expect(board.board[0][1]).toBe(null);
+        // o1 x1
+        // _  _
+        board.board[0][0] = new Piece("o", 1);
+        board.board[1][0] = new Piece("x", 1);
+        expect(board.applyMoves(new Move(0, 0, 1, 0), new Move(1, 0, 0, 0))).toBe(true);
+        expect(board.board[0][0]).toBe(null);
+        expect(board.board[1][0]).toBe(null);
+        // o1 x2
+        // _  _
+        var board = new BreakoutBoard(2, 2);
+        board.board[0][0] = new Piece("o", 1);
+        board.board[1][0] = new Piece("x", 2);
+        expect(board.applyMoves(new Move(0, 0, 1, 0), new Move(1, 0, 0, 0))).toBe(true);
+        expect(board.board[0][0]).toBe(null);
+        expect(board.board[1][0].toString()).toBe("x1");
+        // o2 x1
+        // _  _
+        var board = new BreakoutBoard(2, 2);
+        board.board[0][0] = new Piece("o", 2);
+        board.board[1][0] = new Piece("x", 1);
+        expect(board.applyMoves(new Move(0, 0, 1, 0), new Move(1, 0, 0, 0))).toBe(true);
+        expect(board.board[0][0].toString()).toBe("o1");
+        expect(board.board[1][0]).toBe(null);
+    });
 });
 
 describe('Piece test', function () {

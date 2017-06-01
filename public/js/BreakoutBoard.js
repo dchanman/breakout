@@ -133,7 +133,7 @@ BreakoutBoard.prototype.getLegalMoves = function (col, row) {
  */
 BreakoutBoard.prototype.applyMoves = function (move1, move2) {
     // Check legality of moves
-    var legalMoves1, legalMoves2;
+    var legalMoves1, legalMoves2, piece1, piece2, stack;
     if (move1.x_from === move2.x_from && move1.y_from === move2.y_from) {
         // console.log("Illegal moves: " + move1.toString() + ", " + move2.toString());
         return false;
@@ -147,6 +147,21 @@ BreakoutBoard.prototype.applyMoves = function (move1, move2) {
     if (!move2.isInMoveList(legalMoves2)) {
         // console.log("Illegal move: " + move2.toString());
         return false;
+    }
+    // Case 1: Two adjacent pieces moving into one another:
+    // The larger piece will not be moved
+    if (move1.x_from === move2.x_to && move1.y_from === move2.y_to
+            && move2.x_from === move1.x_to && move2.y_from === move1.y_to) {
+        piece1 = this.board[move1.x_from][move1.y_from];
+        piece2 = this.board[move2.x_from][move2.y_from];
+        stack = Piece.stack(piece1, piece2);
+        this.board[move1.x_from][move1.y_from] = null;
+        this.board[move2.x_from][move2.y_from] = null;
+        if (piece1.isLargerThan(piece2)) {
+            this.board[move1.x_from][move1.y_from] = stack;
+        } else {
+            this.board[move2.x_from][move2.y_from] = stack;
+        }
     }
     return true;
 };
@@ -187,4 +202,8 @@ Piece.prototype.equals = function (other) {
     return (other !== null &&
             this.side === other.side &&
             this.stackHeight === other.stackHeight);
+};
+
+Piece.prototype.isLargerThan = function (other) {
+    return (other !== null && this.stackHeight > other.stackHeight);
 };
