@@ -1,5 +1,12 @@
 "use strict";
 
+var Move = function (x_from, y_from, x_to, y_to) {
+    this.x_from = x_from;
+    this.y_from = y_from;
+    this.x_to = x_to;
+    this.y_to = y_to;
+};
+
 var BreakoutBoard = function (cols, rows) {
     this.cols = cols;
     this.rows = rows;
@@ -65,8 +72,13 @@ BreakoutBoard.prototype.getLegalMoves = function (col, row) {
         legalMoves = [],
         x,
         y,
-        legalMovesHelper = function (board, x, y) {
-            legalMoves.push([x, y]);
+        /**
+         * This function adds the current tile to the set of legal moves.
+         * It then returns 'true' if the tile would not have blocked
+         * any additional legal moves, or 'false' otherwise.
+         */
+        iterativelyAddLegalMoves = function (board, x, y) {
+            legalMoves.push(new Move(col, row, x, y));
             if (board[x][y] && board[x][y].side === side) {
                 return false;
             }
@@ -75,20 +87,20 @@ BreakoutBoard.prototype.getLegalMoves = function (col, row) {
     // Right
     x = col;
     for (y = row + 1; y < this.rows; y++) {
-        if (!legalMovesHelper(this.board, x, y)) { break; }
+        if (!iterativelyAddLegalMoves(this.board, x, y)) { break; }
     }
     // Left
     for (y = row - 1; y >= 0; y--) {
-        if (!legalMovesHelper(this.board, x, y)) { break; }
+        if (!iterativelyAddLegalMoves(this.board, x, y)) { break; }
     }
     // Down
     y = row;
     for (x = col + 1; x < this.cols; x++) {
-        if (!legalMovesHelper(this.board, x, y)) { break; }
+        if (!iterativelyAddLegalMoves(this.board, x, y)) { break; }
     }
     // Up
     for (x = col - 1; x >= 0; x--) {
-        if (!legalMovesHelper(this.board, x, y)) { break; }
+        if (!iterativelyAddLegalMoves(this.board, x, y)) { break; }
     }
     return legalMoves;
 };

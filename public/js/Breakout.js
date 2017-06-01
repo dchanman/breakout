@@ -77,7 +77,7 @@ Breakout.prototype.onClick = function (cell) {
     if (coord.get() !== null) {
         legalMoves = this.breakoutBoard.getLegalMoves(x, y);
         for (i = 0; i < legalMoves.length; i++) {
-            this.board.cell([legalMoves[i][1], legalMoves[i][0]]).DOM().classList.add("legalMove");
+            this.board.cell([legalMoves[i].y_to, legalMoves[i].x_to]).DOM().classList.add("legalMove");
         }
     }
 };
