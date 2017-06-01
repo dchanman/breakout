@@ -7,6 +7,29 @@ var Move = function (x_from, y_from, x_to, y_to) {
     this.y_to = y_to;
 };
 
+Move.prototype.equals = function (other) {
+    return (this.x_from === other.x_from &&
+        this.y_from === other.y_from &&
+        this.x_to === other.x_to &&
+        this.y_to === other.y_to
+    );
+};
+
+Move.prototype.isInMoveList = function (list) {
+    var i;
+    for (i = 0; i < list.length; i++) {
+        if (this.equals(list[i])) {
+            return true;
+        }
+    }
+    return false;
+};
+
+Move.prototype.toString = function () {
+    return "(" + this.x_from + "," + this.y_from + ")-(" +
+        this.x_to + "," + this.y_to + ")";
+};
+
 var BreakoutBoard = function (cols, rows) {
     this.cols = cols;
     this.rows = rows;
@@ -103,6 +126,29 @@ BreakoutBoard.prototype.getLegalMoves = function (col, row) {
         if (!iterativelyAddLegalMoves(this.board, x, y)) { break; }
     }
     return legalMoves;
+};
+
+/**
+ * Simultaneously apply move1 and move2
+ */
+BreakoutBoard.prototype.applyMoves = function (move1, move2) {
+    // Check legality of moves
+    var legalMoves1, legalMoves2;
+    if (move1.x_from === move2.x_from && move1.y_from === move2.y_from) {
+        // console.log("Illegal moves: " + move1.toString() + ", " + move2.toString());
+        return false;
+    }
+    legalMoves1 = this.getLegalMoves(move1.x_from, move1.y_from);
+    if (!move1.isInMoveList(legalMoves1)) {
+        // console.log("Illegal move: " + move1.toString());
+        return false;
+    }
+    legalMoves2 = this.getLegalMoves(move2.x_from, move2.y_from);
+    if (!move2.isInMoveList(legalMoves2)) {
+        // console.log("Illegal move: " + move2.toString());
+        return false;
+    }
+    return true;
 };
 
 var Piece = function (side, stackHeight) {

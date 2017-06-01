@@ -129,6 +129,30 @@ describe('BreakoutBoard test', function () {
             new Move(2, 2, 3, 2), new Move(2, 2, 4, 2)
         ])).toBe(true);
     });
+    it('should not resolve illegal moves', function () {
+        // _ _ _ _ _
+        // _ _ o _ _
+        // _ o x o _
+        // _ _ o _ _
+        // _ _ _ _ _
+        var board = new BreakoutBoard(5, 5);
+        board.board[1][2] = new Piece("o", 1);
+        board.board[2][1] = new Piece("o", 1);
+        board.board[2][2] = new Piece("x", 1);
+        board.board[2][3] = new Piece("o", 1);
+        board.board[3][2] = new Piece("o", 1);
+        // Trying to move nonexistent pieces
+        expect(board.applyMoves(new Move(0, 0, 0, 1), new Move(2, 2, 1, 2))).toBe(false);
+        expect(board.applyMoves(new Move(2, 2, 1, 2), new Move(0, 0, 0, 1))).toBe(false);
+        // Trying to move the same piece
+        expect(board.applyMoves(new Move(2, 2, 1, 2), new Move(2, 2, 1, 2))).toBe(false);
+        expect(board.applyMoves(new Move(2, 2, 1, 2), new Move(2, 2, 2, 1))).toBe(false);
+        // Trying to move illegal moves
+        expect(board.applyMoves(new Move(2, 2, 0, 0), new Move(2, 1, 2, 0))).toBe(false);
+        expect(board.applyMoves(new Move(2, 1, 2, 0), new Move(2, 2, 0, 0))).toBe(false);
+        expect(board.applyMoves(new Move(2, 2, 0, 2), new Move(2, 1, 2, 4))).toBe(false);
+        expect(board.applyMoves(new Move(2, 1, 2, 4), new Move(2, 2, 0, 2))).toBe(false);
+    });
 });
 
 describe('Piece test', function () {
